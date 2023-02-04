@@ -14,22 +14,22 @@ export class AutoCompleter {
     payload.forEach(info => this.head.add(info, 0));
   };
 
-  public find = (query: string, i: number = 0): string[] => {
+  public find = (query: string, i: number = 0): ShippingInfo[] => {
     let result: TrieNode | null = this.head.search(query);
     if (result) {   
 
       // we found an exact match 
       if (result.data) {
-        return [result.data.label_id];
+        return [result.data];
       }
 
       // since there isn't an exact match we recursively collect all potential matches 
-      let collect = (node: TrieNode): string[] => {
+      let collect = (node: TrieNode): ShippingInfo[] => {
         if(node.data) {
-          return [node.data.label_id];
+          return [node.data];
         }
 
-        let result: string[] = [];
+        let result: ShippingInfo[] = [];
         for(let key in node.children) {      
           result = [ ...result, ...collect(node.children[key])];
         }

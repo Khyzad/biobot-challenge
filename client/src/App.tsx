@@ -1,25 +1,25 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { SearchBar } from './SearchBar';
+import { HeaderComponent } from './HeaderComponent';
+import { ResultsComponent } from './ResultsComponent';
+import { ShippingInfo } from './ShippingInfo';
+import axios from 'axios';
 
 function App() {
+  const [shippingInfos, setShippingInfos] = useState([]);
+
+  const getSearchResults = async (query: string) => {
+    setShippingInfos((await axios.get(`http://localhost:3001/api/search/${query}`)).data);
+  }
+
   return (
     <div className="App">
-      <div style={searchPanelStyle}>
-        <img src="/biobot_logo.svg" width="150px" height="75px" />
-        <SearchBar />
-      </div>
-
+      <HeaderComponent getSearch={getSearchResults} />      
+      <ResultsComponent shippingInfos={shippingInfos} />
     </div>
   );
-}
-
-const searchPanelStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "column",
-  minWidth: "50%"
 }
 
 export default App;

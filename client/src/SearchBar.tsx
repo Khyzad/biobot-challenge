@@ -2,9 +2,9 @@ import React, { CSSProperties, FC, useState } from "react";
 import axios from 'axios';
 
 interface Props {
-
+  getSearch: (query: string) => Promise<void>,
 }
-export const SearchBar: FC<Props> = () => {
+export const SearchBar: FC<Props> = (props: Props) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
@@ -23,63 +23,73 @@ export const SearchBar: FC<Props> = () => {
     }
   }
 
-  const onClickSuggestion = (event: React.MouseEvent<HTMLLIElement>, i: number) => {    
+  const onClickSuggestion = (event: React.MouseEvent<HTMLLIElement>, i: number) => {
     setQuery(suggestions[i]);
     setSuggestions([]);
+    props.getSearch(suggestions[i]);
+  }
+
+  const onSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setSuggestions([]);
+    props.getSearch(query);
   }
 
   return (<>
-    <input
-      type="text"
-      value={query}
-      onChange={onChange}
-      placeholder="Search kit id"
-      style={suggestions.length > 0 ? searchBarStyle : emptySearchBarStyle}
-    />
-    {
-      suggestions && suggestions.length > 0 ?
-        <div style={suggestionBoxStyle}>
-          {
-            suggestions.map((suggestion, i: number) => {
-              return <li key={suggestion} style={suggestionStyle} onClick={(e) => onClickSuggestion(e, i)}>
-                {suggestion}
-              </li>
-            })
-          }
-        </div>
-        :
-        <></>
-    }
+    <form onSubmit={onSubmitSearch} style={{ position: 'relative' }}>
+      <input
+        type="text"
+        value={query}
+        onChange={onChange}
+        placeholder="Search kit id"
+        style={suggestions.length > 0 ? searchBarStyle : emptySearchBarStyle}
+      />
+      {
+        suggestions && suggestions.length > 0 ?
+          <div style={suggestionBoxStyle}>
+            {
+              suggestions.map((suggestion, i: number) => {
+                return <li key={suggestion} style={suggestionStyle} onClick={(e) => onClickSuggestion(e, i)}>
+                  {suggestion}
+                </li>
+              })
+            }
+          </div>
+          :
+          <></>
+      }
+    </form>
   </>)
 }
 
 const suggestionBoxStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "center",
+  flexDirection: "column",
   borderTopStyle: "solid",
   borderTopColor: "black",
   backgroundColor: "white",
   zIndex: "2",
   fontSize: "15px",
-  borderTopWidth: "0",
-  listStyle: "none",
-  marginTop: "0",
-  marginLeft: "0",
-  paddingTop: "10px",
-  width: "calc(300px + 2rem)",
-  borderRadius: "0 0 5px 5px",
-  paddingBottom: "10px",
+  padding: "0.5rem",
+  margin: "auto",
+  width: "50vw",
 }
 
 const suggestionStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "left",
-  justifyContent: "left",
+  listStyle: "none",
+  zIndex: "100",
+  flexDirection: "row",
+  alignItems: "center",
   height: "20px",
   backgroundColor: "white",
-  padding: "0.5rem"
+  padding: "0.5rem 0",
 }
 
 const emptySearchBarStyle: CSSProperties = {
-  width: "calc(300px + 1rem)",
+  width: "50vw",
   marginBottom: "0",
   height: "34px",
   fontSize: "16px",
@@ -90,7 +100,7 @@ const emptySearchBarStyle: CSSProperties = {
 }
 
 const searchBarStyle: CSSProperties = {
-  width: "calc(300px + 1rem)",
+  width: "50vw",
   marginBottom: "0",
   height: "34px",
   fontSize: "16px",
